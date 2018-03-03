@@ -11,19 +11,15 @@ config = Config('.', os.environ['MOUNT_DIR'], True)
 @app.route('/')
 def get_index():
     args = dict(zoom=16, lat=37.318373, lon=-122.028352, fields=None)
+    
     args.update(scene_url=url_for('get_scene'))
-    return render_template('index.html', **args)
 
-@app.route('/<run_id>/scene.yaml')
-@app.route('/scene.yaml')
-def get_scene(run_id=None):
     tile_args = dict(zoom=123, col=456, row=789, ext='mvt')
-    if run_id:
-        tile_args.update(run_id=run_id)
-    tile_url = url_for('get_one_tile', **tile_args).replace('123/456/789', '{z}/{x}/{y}')
+    args.update(tile_url=url_for('get_one_tile', **tile_args).replace('123/456/789', '{z}/{x}/{y}')
 
-    return Response(render_template('scene.yaml', tile_url=tile_url),
-        headers={'Content-Type': 'application/x-yaml'})
+    if run_id:
+        args.update(run_id=run_id)
+    return render_template('index.html', **args)
 
 @app.route('/<run_id>/')
 def get_run(run_id):
